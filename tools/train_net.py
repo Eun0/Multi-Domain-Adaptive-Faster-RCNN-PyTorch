@@ -12,11 +12,11 @@ import os
 
 import torch
 from maskrcnn_benchmark.config import cfg
-from maskrcnn_benchmark.data import make_data_loader
+from maskrcnn_benchmark.data import make_data_loader,make_cls_data_loader
 from maskrcnn_benchmark.solver import make_lr_scheduler
 from maskrcnn_benchmark.solver import make_optimizer
 from maskrcnn_benchmark.engine.inference import inference
-from maskrcnn_benchmark.engine.trainer import do_train, do_da_train
+from maskrcnn_benchmark.engine.trainer import do_train,do_cls_da_train
 from maskrcnn_benchmark.modeling.detector import build_detection_model
 from maskrcnn_benchmark.utils.checkpoint import DetectronCheckpointer
 from maskrcnn_benchmark.utils.collect_env import collect_env_info
@@ -56,22 +56,22 @@ def train(cfg, local_rank, distributed):
     checkpoint_period = cfg.SOLVER.CHECKPOINT_PERIOD
 
     if cfg.MODEL.DOMAIN_ADAPTATION_ON:
-        source_data_loader = make_data_loader(
+        source_data_loader = make_cls_data_loader(
             cfg,
             is_train=True,
-            is_source=True,
+            domains=['clean'],
             is_distributed=distributed,
             start_iter=arguments["iteration"],
         )
-        target_data_loader = make_data_loader(
+        target_data_loader = make_cls_data_loader(
             cfg,
             is_train=True,
-            is_source=False,
+            domains=['foggy','snowy'],
             is_distributed=distributed,
             start_iter=arguments["iteration"],
         )
 
-        do_da_train(
+        do_cls_da_train(
             model,
             source_data_loader,
             target_data_loader,
