@@ -138,11 +138,14 @@ def make_mdc_data_loader(cfg, is_train=True, domains=['source'], is_distributed=
             collate_fn=collator,
         )
         data_loaders.append(data_loader)
-    if is_train:
-        # during training, a single (possibly concatenated) data_loader is returned
-        assert len(data_loaders) == 1
-        return data_loaders[0]
+    
+    #if is_train:
+    #    # during training, a single (possibly concatenated) data_loader is returned
+    #    assert len(data_loaders) == 1
+    #    return data_loaders[0]
     return data_loaders
+
+
 def build_dataset(dataset_list, transforms, dataset_catalog, is_train=True, is_source=True):
     """
     Arguments:
