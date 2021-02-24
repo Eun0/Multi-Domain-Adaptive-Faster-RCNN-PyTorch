@@ -4,6 +4,105 @@
 import os
 
 
+class MultiDomainDatasetCatalog(object):
+    DATA_DIR = "datasets"
+    DATASETS = {
+        "cityscapes_fine_instanceonly_seg_train_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_train.json"
+        },
+        "cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        "cityscapes_fine_instanceonly_seg_test_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_test.json"
+        },
+
+        "foggy_cityscapes_fine_instanceonly_seg_train_cocostyle": {
+            "img_dir": "foggy_cityscapes/images",
+            "ann_file": "foggy_cityscapes/annotations/instancesonly_filtered_gtFine_train.json"
+        },
+        "foggy_cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "foggy_cityscapes/images",
+            "ann_file": "foggy_cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        "snowy_cityscapes_fine_instanceonly_seg_train_cocostyle": {
+            "img_dir": "snowy_cityscapes/images",
+            "ann_file": "snowy_cityscapes/annotations/instancesonly_filtered_gtFine_train.json"
+        },
+        "snowy_cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "snowy_cityscapes/images",
+            "ann_file": "snowy_cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        
+        'cityscapes_car_train_cocostyle': {
+                "img_dir": 'cityscapes/images',
+                "ann_file": 'cityscapes/annotations/caronly_filtered_gtFine_train.json',
+        },
+        'cityscapes_car_val_cocostyle': {
+                "img_dir": 'cityscapes/images',
+                "ann_file": 'cityscapes/annotations/caronly_filtered_gtFine_val.json',
+        },
+
+        #small dataset
+        "cityscapes_fine_instanceonly_seg_train_small_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_train_small.json"
+        },
+        "cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        "cityscapes_fine_instanceonly_seg_test_cocostyle": {
+            "img_dir": "cityscapes/images",
+            "ann_file": "cityscapes/annotations/instancesonly_filtered_gtFine_test.json"
+        },
+        "foggy_cityscapes_fine_instanceonly_seg_train_small_cocostyle": {
+            "img_dir": "foggy_cityscapes/images",
+            "ann_file": "foggy_cityscapes/annotations/instancesonly_filtered_gtFine_train_small.json"
+        },
+        "foggy_cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "foggy_cityscapes/images",
+            "ann_file": "foggy_cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        "snowy_cityscapes_fine_instanceonly_seg_train_small_cocostyle": {
+            "img_dir": "snowy_cityscapes/images",
+            "ann_file": "snowy_cityscapes/annotations/instancesonly_filtered_gtFine_train_small.json"
+        },
+        "snowy_cityscapes_fine_instanceonly_seg_val_cocostyle": {
+            "img_dir": "snowy_cityscapes/images",
+            "ann_file": "snowy_cityscapes/annotations/instancesonly_filtered_gtFine_val.json"
+        },
+        'cityscapes_car_train_small_cocostyle': {
+                "img_dir": 'cityscapes/images',
+                "ann_file": 'cityscapes/annotations/caronly_filtered_gtFine_train_small.json',
+        },
+        'cityscapes_car_val_cocostyle': {
+                "img_dir": 'cityscapes/images',
+                "ann_file": 'cityscapes/annotations/caronly_filtered_gtFine_val.json',
+        },
+        
+    }
+
+    @staticmethod
+    def get(name):
+        name = name[0]
+        if "coco" in name:
+            data_dir = MultiDomainDatasetCatalog.DATA_DIR
+            attrs = MultiDomainDatasetCatalog.DATASETS[name]
+            args = dict(
+                root=os.path.join(data_dir, attrs["img_dir"]),
+                ann_file=os.path.join(data_dir, attrs["ann_file"]),
+            )
+            return dict(
+                factory="COCOMultiDomainDataset",
+                args=args,
+            )
+        raise RuntimeError("Dataset not available: {}".format(name))
+
+
 class DatasetCatalog(object):
     DATA_DIR = "datasets"
     DATASETS = {
