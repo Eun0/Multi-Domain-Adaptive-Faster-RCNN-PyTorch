@@ -13,7 +13,7 @@ from . import samplers
 from .collate_batch import BatchCollator
 from .transforms import build_transforms
 
-def build_mdc_dataset(dataset_list, transforms, dataset_catalog, is_train=True, domains=['source']):
+def build_mdc_dataset(dataset_list, transforms, dataset_catalog, is_train = True, domain_dict = None):
     """
     Arguments:
         dataset_list (list[str]): Contains the names of the datasets, i.e.,
@@ -28,6 +28,7 @@ def build_mdc_dataset(dataset_list, transforms, dataset_catalog, is_train=True, 
             "dataset_list should be a list of strings, got {}".format(dataset_list)
         )
     datasets = []
+
     for i,dataset_name in enumerate(dataset_list):
         data = dataset_catalog.get(dataset_name)
         factory = getattr(D, data["factory"])
@@ -39,7 +40,7 @@ def build_mdc_dataset(dataset_list, transforms, dataset_catalog, is_train=True, 
         if data["factory"] == "PascalVOCDataset":
             args["use_difficult"] = not is_train
         args["transforms"] = transforms
-        args["domain"] = domains[i]
+        args["domain"] = domain_dict[dataset_name]
         # make dataset from factory
         dataset = factory(**args)
         datasets.append(dataset)
@@ -58,9 +59,20 @@ def build_mdc_dataset(dataset_list, transforms, dataset_catalog, is_train=True, 
 
     return datasets
     
-def make_mdc_data_loader(cfg, is_train=True, domains=['source'], is_distributed=False, start_iter=0):
+def make_mdc_data_loader(cfg, is_train = True, is_source = True, is_distributed = False, start_iter = 0):
     num_gpus = get_world_size()
     num_targets = len(cfg.DATASETS.TARGET_TRAIN)
+    domain_dict = {}
+
+    if is_source:
+        for domain in cfg.DATASETS.SOURCE_TRAIN:
+            domain_dict[domain] = 1
+    else:
+        id = 1
+        for domain in cfg.DATASETS.TARGET_TRAIN:
+            if domain not in domain_dict:
+                id += 1
+                domain_dict[domain] = id
 
     if is_train:
         images_per_batch = cfg.SOLVER.IMS_PER_BATCH
@@ -114,14 +126,14 @@ def make_mdc_data_loader(cfg, is_train=True, domains=['source'], is_distributed=
     assert is_train 
     if cfg.MODEL.DOMAIN_ADAPTATION_ON:
         dataset_list = []
-        domain_list = cfg.DATASETS.SOURCE_TRAIN if 'source' in domains else cfg.DATASETS.TARGET_TRAIN
+        domain_list = cfg.DATASETS.SOURCE_TRAIN if is_source else cfg.DATASETS.TARGET_TRAIN
         for domain in domain_list:
             dataset_list.append(domain)
     else:
         dataset_list = cfg.DATASETS.TRAIN
 
     transforms = build_transforms(cfg, is_train)
-    datasets = build_mdc_dataset(dataset_list, transforms, DatasetCatalog, is_train, domains)
+    datasets = build_mdc_dataset(dataset_list, transforms, DatasetCatalog, is_train, domain_dict)
 
     data_loaders = []
     for dataset in datasets:

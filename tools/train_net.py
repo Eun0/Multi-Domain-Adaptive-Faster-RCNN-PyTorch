@@ -59,14 +59,14 @@ def train(cfg, local_rank, distributed):
         source_data_loader = make_mdc_data_loader(
             cfg,
             is_train=True,
-            domains=['source'],
+            is_source=True,
             is_distributed=distributed,
             start_iter=arguments["iteration"],
         )
         target_data_loader = make_mdc_data_loader(
             cfg,
             is_train=True,
-            domains=['foggy','snowy'],
+            is_source=False,
             is_distributed=distributed,
             start_iter=arguments["iteration"],
         )
