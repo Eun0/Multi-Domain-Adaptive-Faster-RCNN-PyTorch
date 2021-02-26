@@ -4,3 +4,5 @@ datasets/
 build/
 *.egg-info
 *.so
+
+*/__pychache__/*
